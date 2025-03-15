@@ -1,66 +1,190 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Project Management System with EAV Support
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A Laravel-based project management system with dynamic attributes (EAV) support, user authentication, and timesheet
+tracking.
 
-## About Laravel
+## Features
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- User Authentication (Register, Login, Logout)
+- Project Management with Dynamic Attributes
+- Timesheet Tracking
+- RESTful API
+- Flexible Filtering System
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Requirements
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- PHP 8.1+
+- Composer
+- MySQL/PostgreSQL
+- Laravel Passport
 
-## Learning Laravel
+## Installation
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+1. Clone the repository
+2. Install dependencies:
+   ```bash
+   composer install
+   ```
+3. Copy `.env.example` to `.env` and configure your database:
+   ```bash
+   cp .env.example .env
+   ```
+4. Generate application key:
+   ```bash
+   php artisan key:generate
+   ```
+5. Run migrations and Seeders:
+   ```bash
+   php artisan migrate --seed
+   ```
+6. Generate a Passport keys:
+   ```bash
+   php artisan passport:keys
+   ```
+7. Create a Passport Personal Client:
+   ```bash
+   php artisan passport:client --personal --name="Personal Access Client"
+   ```
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+## API Documentation
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### Authentication
 
-## Laravel Sponsors
+#### Register
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+- **POST** `/api/register`
 
-### Premium Partners
+```json
+{
+   "name": "John Doe",
+   "email": "john@example.com",
+   "password": "password123",
+   "password_confirmation": "password123"
+}
+```
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+#### Login
 
-## Contributing
+- **POST** `/api/login`
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```json
+{
+   "email": "john@example.com",
+   "password": "password123"
+}
+```
 
-## Code of Conduct
+### Projects
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+#### List Projects
 
-## Security Vulnerabilities
+- show one **GET** `/api/projects/{project id}`
+- list **GET** `/api/projects`
+- Supports pagination: `?page=1&perPage=15`
+- Supports filtering: `?filter[name]=Project1&filter[status]=active`
+- Supports **Attribute (EAV)** filtering:`?filter[attribute][start_date]=>=2024-02-03&filter[attribute][department]=LIKEProject1`
+   - Operands: `<=,<,=,>,>=,!=,LIKE` operand must stick before value except for `=` that don't need to mention and is
+     default.
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+#### Project
+
+- create **POST** `/api/projects`
+- update **PUT** `/api/projects/{project id}`
+
+```json
+{
+   "name": "New Project",
+   "status": "active",
+   "attributes": {
+      "client": "ACME Corp",
+      "priority": "high"
+   }
+}
+```
+- delete **DELETE** `api/project/{project id}`
+
+### Timesheets
+
+#### List Timesheets
+
+- **GET** `/api/timesheets`
+- Supports pagination: `?page=1&perPage=15`
+
+#### Create Timesheet
+
+- **POST** `/api/timesheets`
+
+```json
+{
+   "project_id": 1,
+   "description": "Working on feature X",
+   "hours": 8,
+   "date": "2025-03-14"
+}
+```
+
+### Attributes
+
+#### List Attributes
+
+- **GET** `/api/attributes`
+
+#### Create Attribute
+
+- **POST** `/api/attributes`
+
+```json
+{
+   "name": "priority",
+   "type": "string",
+   "options": [
+      "low",
+      "medium",
+      "high"
+   ]
+}
+```
+
+## Test Credentials
+
+Create these credentials with register API for testing the APIs:
+
+```
+Email: test@example.com
+Password: password123
+```
+
+## Response Format
+
+All API responses follow this structure:
+
+### Success Response
+
+```json
+{
+   "data": [
+      ...
+   ],
+   "currentPage": 1,
+   "perPage": 15,
+   "total": 50,
+   "lastPage": 4
+}
+```
+
+### Error Response
+
+```json
+{
+   "message": "Error message",
+   "errors": {
+      "field": [
+         "Validation error message"
+      ]
+   }
+}
+```
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+This project is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
