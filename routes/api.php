@@ -42,4 +42,15 @@ Route::middleware('auth:api')->group(function () {
 			Route::put('/{timesheet}', 'update')->name('update');
 			Route::delete('/{timesheet}', 'delete')->name('delete');
 		});
+
+	Route::prefix('attributes')
+		->name('attributes.')
+		->controller(\App\Http\Controllers\Api\AttributeController::class)
+		->group(function () {
+			Route::get('/', 'list')->name('list');
+			Route::get('/{attribute}', 'show')->name('show');
+			Route::post('/', 'create')->name('create');
+			Route::put('/{attribute}', 'update')->name('update');
+			Route::delete('/{attribute}', 'delete')->name('delete');
+		});
 });
