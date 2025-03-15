@@ -31,4 +31,15 @@ Route::middleware('auth:api')->group(function () {
 			Route::put('/{user}', 'update')->name('update');
 			Route::delete('/{user}', 'delete')->name('delete');
 		});
+
+	Route::prefix('timesheets')
+		->name('timesheets.')
+		->controller(\App\Http\Controllers\Api\TimesheetController::class)
+		->group(function () {
+			Route::get('/', 'list')->name('list');
+			Route::get('/{timesheet}', 'show')->name('show');
+			Route::post('/', 'create')->name('create');
+			Route::put('/{timesheet}', 'update')->name('update');
+			Route::delete('/{timesheet}', 'delete')->name('delete');
+		});
 });
