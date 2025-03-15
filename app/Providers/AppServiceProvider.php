@@ -2,8 +2,10 @@
 
 namespace App\Providers;
 
+use App\Models\Project;
 use App\Models\Timesheet;
 use App\Models\User;
+use App\Policies\ProjectPolicy;
 use App\Policies\TimesheetPolicy;
 use App\Policies\UserPolicy;
 use Illuminate\Support\Facades\Gate;
@@ -24,8 +26,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
-    }
 	    $this->policies();
     }
 
@@ -33,6 +33,7 @@ class AppServiceProvider extends ServiceProvider
 	public function policies(): void
 	{
 		Gate::policy(User::class, UserPolicy::class);
+		Gate::policy(Project::class, ProjectPolicy::class);
 		Gate::policy(Timesheet::class, TimesheetPolicy::class);
 	}
 }
